@@ -1,0 +1,21 @@
+10
+
+Pop
+
+Append Heart 6
+
+Append Club 2
+
+Pop
+
+Append Heart 2
+
+Revert
+
+Append Heart 3
+
+Append Heart J
+
+Append Heart 2
+
+Extract Club
