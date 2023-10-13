@@ -51,6 +51,7 @@ Status DeQueue(LinkQueue&Q,ElemType &e)
 	Q.front ->next = temp->next;
 	if(!temp->next)
 	  Q.rear = Q.front;
+	e = temp->data;
 	free(temp);
 	return OK;
 }
