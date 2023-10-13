@@ -44,66 +44,66 @@ Status StackEmpty(SqStack S)
 {
 	return !S.top;
 }
-char compare(char c1,char c2){
-	switch(c1){
+char compare(char in,char cur){
+	switch(in){
 		case '|':
-			if(c2=='|')
-			  return '>';
-			else if(c2=='&')
+			if(cur=='|')
 			  return '<';
-			else if(c2=='!')
+			else if(cur=='&')
 			  return '<';
-			else if(c2=='(')
+			else if(cur=='!')
+			  return '<';
+			else if(cur=='(')
 			  return '>';
-			else if(c2==')')
+			else if(cur==')')
 			  return '>';
 			break;
 		case '&':
-			if(c2=='|')
+			if(cur=='|')
 			  return '>';
-			else if(c2=='&')
-			  return '>';
-			else if(c2=='!')
+			else if(cur=='&')
 			  return '<';
-			else if(c2=='(')
+			else if(cur=='!')
+			  return '<';
+			else if(cur=='(')
 			  return '>';
-			else if(c2==')')
+			else if(cur==')')
 			  return '>';
 			break;
 		case '!':
-			if(c2=='|')
+			if(cur=='|')
 			  return '>';
-			else if(c2=='&')
+			else if(cur=='&')
 			  return '>';
-			else if(c2=='!')
+			else if(cur=='!')
+			  return '<';
+			else if(cur=='(')
 			  return '>';
-			else if(c2=='(')
-			  return '>';
-			else if(c2==')')
+			else if(cur==')')
 			  return '>';
 			break;
 		case '(':
-			if(c2=='|')
-			  return '<';
-			else if(c2=='&')
-			  return '<';
-			else if(c2=='!')
-			  return '<';
-			else if(c2=='(')
+			if(cur=='|')
 			  return '>';
-			else if(c2==')')
+			else if(cur=='&')
+			  return '>';
+			else if(cur=='!')
+			  return '>';
+			else if(cur=='(')
+			  return '>';
+			else if(cur==')')
 			  return '<';
 			break;
 		case ')':
-			if(c2=='|')
+			if(cur=='|')
+			  return '<';
+			else if(cur=='&')
+			  return '<';
+			else if(cur=='!')
+			  return '<';
+			else if(cur=='(')
 			  return '>';
-			else if(c2=='&')
-			  return '>';
-			else if(c2=='!')
-			  return '>';
-			else if(c2=='(')
-			  return '>';
-			else if(c2==')')
+			else if(cur==')')
 			  return '<';
 			break;
 	}
@@ -123,6 +123,7 @@ void calc(SqStack &Operand,SqStack &Opt)
 		return;
 	}
 	Pop(Operand,c2);
+	//printf("calc item:%c %c %c\n",c1,c2,opt);
 	if(c1=='V')
 	  a =1;
 	else 
@@ -134,8 +135,10 @@ void calc(SqStack &Operand,SqStack &Opt)
 	switch(opt){
 		case '|':
 			ans = a||b;
+			break;
 		case '&':
 			ans = a&&b;
+			break;
 	}	
 	if(ans)
 	  Push(Operand,'V');
@@ -148,21 +151,32 @@ int main()
 	InitStack(Operand);
 	InitStack(Opt);
 	int n =0;
-	while(scanf("%s",&expression)&&expression[0]){
-
-		printf("%d %d",Operand.top,Opt.top);
-
+	int end = 0;
+	while(1){
+		//printf("%d %d",Operand.top,Opt.top);
 		int i =0;
-		char temp;
+		char temp=getchar();
+		if(temp =='\r'||temp =='\n')
+		  continue;
+		while(temp !='\r'&&temp!='\n'){
+			if(temp == EOF){
+		  end =1;
+			break;
+			}
+		if(temp !=' ')
+			expression[i++]=temp;
+			temp = getchar();
+		
+		}
+
+		i =0;
 		while(expression[i]){
-
 			char test1, test2;
-			GetTop(Operand,test1);
-			GetTop(Opt,test2);
-
-			printf("%c %c\n",test1,test2);
-
-
+			//
+//			GetTop(Operand,test1);
+//			GetTop(Opt,test2);
+//			printf("%c %c\n",test1,test2);
+			//
 			if(expression[i]==' ')//过滤空格
 			  continue;
 			if(expression[i]=='V'||expression[i]=='F')
@@ -171,25 +185,32 @@ int main()
 				if(!StackEmpty(Opt)){
 					GetTop(Opt,temp);
 					while(compare(expression[i],temp)=='<'){
+//						printf("compare item:%c %c\n",expression[i],temp);
 					  calc(Operand,Opt);
-					  printf("calc\n");
+					  if(StackEmpty(Opt))
+						break;
+					  else 
+						GetTop(Opt,temp);
+//					  printf("calc\n");
 					}
 					if(expression[i]==')'){
 						Pop(Opt,temp);
-						printf("pop )\n");
+			//			printf("pop )\n");
 						i++;
 						continue;
 					}
 				}
 				Push(Opt,expression[i]);
-				printf("push %c\n",expression[i]);
+			//	printf("push %c\n",expression[i]);
 			}
 			i++;
 		}
-		if(!StackEmpty(Opt));
+		if(!StackEmpty(Opt))
 		calc(Operand,Opt);
 		Pop(Operand,temp);
 		printf("Expression %d: %c\n",++n,temp);
+		if(end)
+		  break;
 	}
 	return 0;
 }
