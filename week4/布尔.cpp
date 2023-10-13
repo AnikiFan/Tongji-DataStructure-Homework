@@ -59,7 +59,7 @@ char compare(char in,char cur){
 			else if(cur==')')
 			  return '>';
 			break;
-		case '&'：
+		case '&':
 			if(cur=='|')
 			  return '>';
 			else if(cur=='&')
@@ -77,7 +77,7 @@ char compare(char in,char cur){
 			else if(cur=='&')
 			  return '>';
 			else if(cur=='!')
-			  return '<';
+			  return '>';
 			else if(cur=='(')
 			  return '>';
 			else if(cur==')')
@@ -124,7 +124,7 @@ void calc(SqStack &Operand,SqStack &Opt)
 		return;
 	}
 	Pop(Operand,c2);
-	printf("calc item:%c %c %c\n",c1,c2,opt);
+	//printf("calc item:%c %c %c\n",c1,c2,opt);
 	if(c1=='V')
 	  a =1;
 	else 
@@ -141,7 +141,7 @@ void calc(SqStack &Operand,SqStack &Opt)
 			ans = a&&b;
 			break;
 	}	
-	printf("answer:%d\n",ans);
+	//printf("answer:%d\n",ans);
 	if(ans)
 	  Push(Operand,'V');
 	else
@@ -169,24 +169,24 @@ int main()
 			temp = getchar();
 		}
 		expression[i]='\0';
-		printf("expression:%s\n",expression);
+	//	printf("expression:%s\n",expression);
 
 		i =0;
 		while(expression[i]){
 			char test1, test2;
 			//
-			GetTop(Operand,test1);
-			GetTop(Opt,test2);
-			printf("%c %c\n",test1,test2);
+	//		GetTop(Operand,test1);
+	//		GetTop(Opt,test2);
+	//		printf("%c %c\n",test1,test2);
 			//
 			if(expression[i]=='V'||expression[i]=='F'){
 				Push(Operand ,expression[i]);
-				printf("push %c\n",expression[i]);
+	//			printf("push %c\n",expression[i]);
 			}
 			else{
 				if(!StackEmpty(Opt)){
 					GetTop(Opt,temp);
-					printf("compare item:%c %c\n",expression[i],temp);
+	//				printf("compare item:%c %c\n",expression[i],temp);
 					while(compare(expression[i],temp)=='<'){
 						calc(Operand,Opt);
 						if(StackEmpty(Opt))
@@ -197,13 +197,13 @@ int main()
 					}
 					if(expression[i]==')'){
 						Pop(Opt,temp);
-						printf("pop ()\n");
+	//					printf("pop ()\n");
 						i++;
 						continue;
 					}
 				}
 				Push(Opt,expression[i]);
-				printf("push %c\n",expression[i]);
+	//			printf("push %c\n",expression[i]);
 			}
 			i++;
 		}
