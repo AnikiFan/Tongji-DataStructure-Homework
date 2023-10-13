@@ -1,4 +1,5 @@
 //运用栈来求解表达式
+//注意连续多个取反的处理
 #include<stdio.h>
 
 #define MAX_SIZE 1100
@@ -58,7 +59,7 @@ char compare(char in,char cur){
 			else if(cur==')')
 			  return '>';
 			break;
-		case '&':
+		case '&'：
 			if(cur=='|')
 			  return '>';
 			else if(cur=='&')
@@ -123,7 +124,7 @@ void calc(SqStack &Operand,SqStack &Opt)
 		return;
 	}
 	Pop(Operand,c2);
-	//printf("calc item:%c %c %c\n",c1,c2,opt);
+	printf("calc item:%c %c %c\n",c1,c2,opt);
 	if(c1=='V')
 	  a =1;
 	else 
@@ -140,6 +141,7 @@ void calc(SqStack &Operand,SqStack &Opt)
 			ans = a&&b;
 			break;
 	}	
+	printf("answer:%d\n",ans);
 	if(ans)
 	  Push(Operand,'V');
 	else
@@ -153,64 +155,62 @@ int main()
 	int n =0;
 	int end = 0;
 	while(1){
-		//printf("%d %d",Operand.top,Opt.top);
+		//printf("%d %d\n",Operand.top,Opt.top);
 		int i =0;
 		char temp=getchar();
 		if(temp =='\r'||temp =='\n')
 		  continue;
 		while(temp !='\r'&&temp!='\n'){
 			if(temp == EOF){
-		  end =1;
-			break;
+				return 0;
 			}
-		if(temp !=' ')
-			expression[i++]=temp;
+			if(temp !=' ')
+			  expression[i++]=temp;
 			temp = getchar();
-		
 		}
+		expression[i]='\0';
+		printf("expression:%s\n",expression);
 
 		i =0;
 		while(expression[i]){
 			char test1, test2;
 			//
-//			GetTop(Operand,test1);
-//			GetTop(Opt,test2);
-//			printf("%c %c\n",test1,test2);
+			GetTop(Operand,test1);
+			GetTop(Opt,test2);
+			printf("%c %c\n",test1,test2);
 			//
-			if(expression[i]==' ')//过滤空格
-			  continue;
-			if(expression[i]=='V'||expression[i]=='F')
-			  Push(Operand ,expression[i]);
+			if(expression[i]=='V'||expression[i]=='F'){
+				Push(Operand ,expression[i]);
+				printf("push %c\n",expression[i]);
+			}
 			else{
 				if(!StackEmpty(Opt)){
 					GetTop(Opt,temp);
+					printf("compare item:%c %c\n",expression[i],temp);
 					while(compare(expression[i],temp)=='<'){
-//						printf("compare item:%c %c\n",expression[i],temp);
-					  calc(Operand,Opt);
-					  if(StackEmpty(Opt))
-						break;
-					  else 
-						GetTop(Opt,temp);
-//					  printf("calc\n");
+						calc(Operand,Opt);
+						if(StackEmpty(Opt))
+						  break;
+						else 
+						  GetTop(Opt,temp);
+						//					  printf("calc\n");
 					}
 					if(expression[i]==')'){
 						Pop(Opt,temp);
-			//			printf("pop )\n");
+						printf("pop ()\n");
 						i++;
 						continue;
 					}
 				}
 				Push(Opt,expression[i]);
-			//	printf("push %c\n",expression[i]);
+				printf("push %c\n",expression[i]);
 			}
 			i++;
 		}
-		if(!StackEmpty(Opt))
-		calc(Operand,Opt);
+		while(!StackEmpty(Opt))
+		  calc(Operand,Opt);
 		Pop(Operand,temp);
 		printf("Expression %d: %c\n",++n,temp);
-		if(end)
-		  break;
 	}
 	return 0;
 }
