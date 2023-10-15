@@ -1,10 +1,21 @@
-4
-1650400	叶肯
-1650800	张一
-1652501	李红
-1653010	王豪
-insert 1 1654660 张三
-remove 1
-check name 李红
-check no 1650400
-end
+10
+
+Pop
+
+Append Heart 6
+
+Append Club 2
+
+Pop
+
+Append Heart 2
+
+Revert
+
+Append Heart 3
+
+Append Heart J
+
+Append Heart 2
+
+Extract Club
