@@ -131,11 +131,47 @@ Status EmptyString(HString&Sub){
 	Sub.length = 0;
 	return OK;
 }
+int BruteSearch(HString pat,HString S){
+	printf("Begin BruteSearch\n");
+	int i =0,j=0;
+	printf("S.length:%d pat.length: %d\n",S.length,pat.length);
+	while(i<S.length ){
+		while(j<pat.length){
+		  if(pat.ch[j]!=S.ch[i+j])
+			break;
+		j++;
+		}
+		if(j==pat.length)
+		  break;
+		j=0;
+		i++;
+	}
+	if(i==S.length)
+	  return 0;
+	return i+1;
+}
+Status Make_next(HString,HString pat,int next[]){
+
+}
+int KMP(HString pat,HString S,int next []){
+	int i =0,j=0;
+	while(i<S.length){
+		if(S.ch[i]!=pat.ch[j]){
+			j = next[j];//存储的是下一个搜索的位置
+			i++;
+		}
+		else
+			j++;
+		if(j == pat.length)
+		  return i;
+	}
+	return 0;
+}
 
 int main()
 {
 	printf("----TEST BEGIN----\n");
-	HString s,s1,s2,s3;
+	HString s,s1,s2,s3,pat,S;
 	int temp;
 	StrAssign(s,"main");
 	StrAssign(s1,"insert");
@@ -156,6 +192,14 @@ int main()
 	temp = StrCompare(s,s3);
 	printf("s vs s1:%d\n",temp);
 	SubString(s2,s1,1,3);
+	StrAssign(pat,"123");
+	StrAssign(S,"333333333");
+	temp= BruteSearch(pat,S);
+	printf("pos:%d\n",temp);
+	StrAssign(S,"233523123");
+	temp= BruteSearch(pat,S);
+	printf("pos:%d\n",temp);
+	
 	printf("----TEST FINISH----\n");
 	return 0;
 }
