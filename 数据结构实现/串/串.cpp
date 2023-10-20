@@ -150,20 +150,48 @@ int BruteSearch(HString pat,HString S){
 	  return 0;
 	return i+1;
 }
-Status Make_next(HString,HString pat,int next[]){
-
+Status Make_next(HString pat,int *&next){
+	if(!(next=(int*)malloc(sizeof(int)*pat.length)))
+	  OVERFLOW
+	int now;
+	next[0]=0;
+	next[1]=0;
+	for(int i =2;i<pat.length;i++){
+		printf("i:%d\n\n",i);
+		now = next[i-1];
+		while(1){
+			printf("now:%d\n",now);
+			if(pat.ch[now]==pat.ch[i-1]){
+				next[i]=now+1;
+				break;
+			}
+			if(!now){
+				next[i]=0;
+				break;
+			}
+			now = next[now];
+		}
+		printf("next[%d]:%d\n",i,next[i]);
+	}
+	return OK;
 }
 int KMP(HString pat,HString S,int next []){
 	int i =0,j=0;
 	while(i<S.length){
-		if(S.ch[i]!=pat.ch[j]){
-			j = next[j];//存储的是下一个搜索的位置
+		printf("i:%d j:%d\n",i,j);
+		if(pat.ch[j]==S.ch[i]){//相同
+		//		printf("***\n");
 			i++;
-		}
-		else
 			j++;
-		if(j == pat.length)
-		  return i;
+		}
+		else{
+		//		printf("%%%%\n");
+			j=next[j];//跳转至下一个待判断的字符
+			if(!j)//说明要重新判断
+			  i++;
+		}
+		if(j==pat.length)
+		  return i-pat.length+1;//最后一次判断后仍然加一，此时i视为pos而非下标
 	}
 	return 0;
 }
@@ -173,6 +201,7 @@ int main()
 	printf("----TEST BEGIN----\n");
 	HString s,s1,s2,s3,pat,S;
 	int temp;
+	int * test;
 	StrAssign(s,"main");
 	StrAssign(s1,"insert");
 	TraverseString(s,visit);
@@ -196,10 +225,14 @@ int main()
 	StrAssign(S,"333333333");
 	temp= BruteSearch(pat,S);
 	printf("pos:%d\n",temp);
-	StrAssign(S,"233523123");
+	StrAssign(S,"21233523123");
 	temp= BruteSearch(pat,S);
 	printf("pos:%d\n",temp);
-	
+
+	Make_next(pat,test);
+	printf("%d %d %d\n\n",test[0],test[1],test[2]);
+	temp= KMP(pat,S,test);
+	printf("pos:%d\n",temp);
 	printf("----TEST FINISH----\n");
 	return 0;
 }
