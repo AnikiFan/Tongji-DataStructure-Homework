@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<malloc.h>
 #include<stdio.h>
 
@@ -11,7 +12,7 @@ typedef struct Node{
 	ElemType data;
 	struct Node *lchild,*rchild;
 }Node,*Tree;
-Status InitTree(Tree &T,int n);//n为深度
+Status CreateTree(Tree &T);
 Status visit(Tree T);
 //递归实现
 Status PreOrderTraverse(Tree T,Status(*visit)(Tree));
@@ -19,12 +20,17 @@ Status InOrderTraverse(Tree T,Status(*visit)(Tree));
 Status PosOrderTraverse(Tree T,Status(*visit)(Tree));
 //非递归，栈实现
 Status PreOrder(Tree T,Status(*visit)(Tree));
+//Status PreOrder(Tree T,Status(*visit)(Tree));
+//Status PreOrder(Tree T,Status(*visit)(Tree));
+//Status Display(Tree T);
+//int Depth(Tree T);
+//int Size(Tree T);
 
 int main()
 {
 	printf("=======TEST BEGIN=======\n");
 	Tree T;
-	InitTree(T,3);
+	CreateTree(T);
 	printf("----PreOrderTraverse----\n");
 	PreOrderTraverse(T,visit);
 	printf("------------------------\n");
@@ -38,19 +44,25 @@ int main()
 	return 0;
 }
 
-Status InitTree(Tree &T,int n)
+Status CreateTree(Tree &T)
 {
-	if(!n)
-	  return OK;
-	T = (Tree)calloc(sizeof(Node),1);//将指针初始化为NULL，如果用malloc，则需要另外置NULL
+	ElemType input;
+	scanf("%d",&input);
+	if(!input){
+		T = NULL;
+		printf("create empty node\n");
+		return OK;
+	}
+	T = (Tree)malloc(sizeof(Node));
 	if(!T)
 	  OVERFLOW;
-	T->data = n;
-	printf("create node with %d\n",n);
-	InitTree(T->lchild, n-1);
-	InitTree(T->rchild, n-1);
+	T->data = input;
+	printf("create node with %d\n",input);
+	CreateTree(T->lchild);
+	CreateTree(T->rchild);
 	return OK;
 }
+
 Status visit(Tree T)
 {
 	printf("%d\n",T->data);
@@ -66,6 +78,7 @@ Status PreOrderTraverse(Tree T,Status(*visit)(Tree))
 	  PreOrderTraverse(T->rchild,visit);
 	return OK;
 }
+
 Status InOrderTraverse(Tree T,Status(*visit)(Tree))
 {
 	if(T->lchild)
@@ -75,6 +88,7 @@ Status InOrderTraverse(Tree T,Status(*visit)(Tree))
 	  PreOrderTraverse(T->rchild,visit);
 	return OK;
 }
+
 Status PosOrderTraverse(Tree T,Status(*visit)(Tree))
 {
 	if(T->lchild)
