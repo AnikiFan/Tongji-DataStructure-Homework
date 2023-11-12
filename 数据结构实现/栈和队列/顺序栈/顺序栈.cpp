@@ -1,20 +1,5 @@
-#include<stdio.h>
-#include<process.h>
-#include<malloc.h>
-
-#define OK 1
-#define TRUE 1
-#define FALSE 0
-#define ERROR 0
-#define INIT_STACK_SIZE 100
-#define STACK_SIZE_INCREMENT 100
-
-typedef int Status,ElemType;
-typedef struct{
-	ElemType* top;
-	ElemType* base;
-	int stacksize;
-}SqStack;
+#include "顺序栈.h"
+#include"../../header.h"
 Status InitStack(SqStack &S)
 {
 	S.base = (ElemType*)malloc(sizeof(ElemType)*INIT_STACK_SIZE);
@@ -49,26 +34,5 @@ Status Pop(SqStack &S,ElemType &e)
 	  return ERROR;
 	e = *--S.top;
 	return OK;
-}
-
-int main()
-{
-	SqStack S;
-	ElemType temp;
-	InitStack(S);
-	printf("----TEST BEGIN----\n");
-	printf("----TEST FOR PUSH,POP AND GETTOP\n");
-	Push(S,1);
-	GetTop(S,temp);
-	printf("%d/n",temp);
-	Push(S,2);
-	GetTop(S,temp);
-	printf("%d/n",temp);
-	Push(S,114514);
-	Pop(S,temp);
-	printf("%d/n",temp);
-	GetTop(S,temp);
-	printf("%d/n",temp);
-	return 0;
 }
 

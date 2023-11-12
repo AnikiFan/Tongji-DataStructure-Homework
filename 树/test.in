@@ -1,0 +1,13 @@
+6
+push a
+push b
+push c
+pop
+pop
+push d
+pop
+pop
+push e
+push f
+pop
+pop
