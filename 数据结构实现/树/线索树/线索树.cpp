@@ -31,29 +31,61 @@ Status CreatePreTree(Tree& T)
 Status MakePreThread(Tree& T,Tree &pre)
 {
 	if(T){
-		MakePreThread(T->lchild,pre);
-		if(pre&&!pre->rchild){
-			pre->rchild = T;
-			pre->RTag= Thread;
+		if(T->rchild)
+		  T->RTag=Link;
+		else 
+		  T->RTag = Thread;
+		if(T->lchild)
+		  T->LTag=Link;
+		else{
+		  T->LTag=Thread;
+		 T->lchild = pre;
 		}
-		if(!T->lchild){
-			T->lchild = pre;
-			T->LTag=Thread;
-		}
+		if(pre&&!pre->rchild)
+		  pre->rchild = T;
 		pre = T;
-		MakePreThread(T->rchild,pre);
+		if(T->LTag==Link)
+			MakePreThread(T->lchild,pre);
+		if(T->RTag==Link)
+			MakePreThread(T->rchild,pre);
 	}
 	return OK;
 }
+void PrintInfo(Tree T)
+{
+	if(!T)
+	  return;
+	cout<<endl;
+	cout<<"data:"<<T->data<<endl;
+	cout<<"LTag:"<<(T->LTag==Thread?"Thread":"Link")<<endl;
+	cout<<"RTag:"<<(T->RTag==Thread?"Thread":"Link")<<endl;
+	cout<<"Lchild:"<<(T->lchild?T->lchild->data:'#')<<endl;
+	cout<<"Rchild:"<<(T->rchild?T->rchild->data:'#')<<endl;
+	cout<<endl;
+	return;
+}
+Status PreOrder(Tree T)
+{
+	if(!T)
+	  return OK;
+	PrintInfo(T);
+	PreOrder(T->lchild);
+	PreOrder(T->rchild);
+	return OK;
+}
+
 Status CreatePreThreadTree(Tree& T)
 {
 	Tree pre = NULL;
+	cout<<"Initial Tree"<<endl;
 	CreatePreTree(T);
+	cout<<"Make Pre Thread"<<endl;
 	MakePreThread(T,pre);
 	return OK;
 }
 Status PreTraverse(Tree T)
 {
+	cout<<"Pre Thread Traverse"<<endl;
 	while(T){
 		while(T->LTag==Link){
 			cout<<T->data;
@@ -64,10 +96,17 @@ Status PreTraverse(Tree T)
 	}
 	return OK;
 }
+Status PreThreadInverseTraverse(Tree T)
+{
+	return OK;
+}
 int main()
 {
 	Tree T;
-	CreatePreTree(T);
+	cout<<"=======TEST BEGIN======="<<endl;
+	CreatePreThreadTree(T);
 	PreTraverse(T);
+	cout<<endl;
+	cout<<"=======TEST E N D======="<<endl;
 	return 0;
 }
