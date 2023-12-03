@@ -4,7 +4,6 @@
 #define MAXN 110
 #define Infinity 10000
 int AdjMat[MAXN][MAXN];
-int Flag[MAXN][MAXN] = { 0 };
 typedef struct {
 	int i;
 	int j;
