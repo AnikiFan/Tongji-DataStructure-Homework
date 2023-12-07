@@ -26,26 +26,27 @@ Status InitGraph(Graph&G)
 {
 	cin >> G.VecNum;
 	G.ArcNum = 0;
-	G.Vertices = new Vec[G.VecNum];
+	G.Vertices = new Vec[G.VecNum+1];
 	if(!G.Vertices){
 		cout<<"OVERFLOW"<<endl;
 		getchar();
 		return -2;
 	}
-	for(int i = 0;i<G.VecNum;i++)
+	for(int i = 0;i<G.VecNum+1;i++)
 	  G.Vertices[i].in = 0;
 	int n;
 	Arc*p;
-	for(int i = 0;i<G.VecNum;i++){
+	for(int i = 1;i<G.VecNum+1;i++){
 		cin>> G.Vertices[i].w;
 		G.Vertices[i].firstArc = NULL;
-		cin>>n;
-		for(int j = 0;j<n;j++){
+		cin>>G.Vertices[i].in;
+		int from;
+		for(int j = 0;j<G.Vertices[i].in;j++){
 			p = new Arc;
-			cin>> p->pos;
-			G.Vertices[p->pos].in ++;
-			p->next = G.Vertices[i].firstArc;
-			G.Vertices[i].firstArc = p;
+			p->pos = i;
+			cin>>from;
+			p->next = G.Vertices[from].firstArc;
+			G.Vertices[from].firstArc = p;
 		}
 	}
 	G.top= -1;
@@ -55,10 +56,10 @@ Status Topo(Graph&G)
 {
 	int count = G.VecNum;
 	int top =-1;
-	int* temp= new int[G.VecNum]{0};
+	int* temp= new int[G.VecNum+1]{0};
 	Arc* p;
 	while(count){
-		for(int i =0;i<G.VecNum;i++)
+		for(int i =1;i<G.VecNum+1;i++)
 			if(!G.Vertices[i].in&&!temp[i]){
 			  G.Vertices[i].in = top;
 			  temp[i]=1;
@@ -73,11 +74,6 @@ Status Topo(Graph&G)
 		count--;
 	}
 	G.top = top;
-	int t  = top;
-	while(t!=-1){
-		cout<<t<<endl;
-		t = G.Vertices[t].in;
-	}
 	return OK;
 }
 Status GetVe(Graph&G)
@@ -90,34 +86,37 @@ Status GetVe(Graph&G)
 		S.push(top);
 		top = G.Vertices[top].in;
 	}
-	for(int i = 0;i<G.VecNum;i++)
-	  G.Vertices[i].e = 0;
+	for(int i = 1;i<=G.VecNum;i++)
+	  G.Vertices[i].e = G.Vertices[S.top()].w;
 	while(!S.empty()){
 		now = S.top();
 		S.pop();
 		p = G.Vertices[now].firstArc;
-		while(!p){
-			if(G.Vertices[p->pos].e<G.Vertices[p->pos].w+G.Vertices[now].e)
-			  G.Vertices[p->pos].e=G.Vertices[p->pos].w+G.Vertices[now].e;
+		while(p){
+			if(G.Vertices[p->pos].e<G.Vertices[now].w+G.Vertices[now].e)
+			  G.Vertices[p->pos].e=G.Vertices[now].w+G.Vertices[now].e;
 			p = p->next;
 		}
 	}
+	for(int i = 1;i<=G.VecNum;i++)
+	  cout<<G.Vertices[i].e<<endl;
+	cout<<"**"<<endl;
 	return OK;
 }
 Status GetVl(Graph&G)
 {
 	int top =G.top;
 	Arc*p ;
-	for(int i = 0;i<G.VecNum;i++)
+	for(int i = 1;i<=G.VecNum;i++)
 	  G.Vertices[i].l=G.Vertices[top].e;
 	while(top!=-1){
-		top = G.Vertices[top].in;
 		p = G.Vertices[top].firstArc;
-		while(!p){
+		while(p){
 			if(G.Vertices[p->pos].l-G.Vertices[top].w<G.Vertices[top].l)
 			  G.Vertices[top].l=G.Vertices[p->pos].l-G.Vertices[top].w;
 			p = p->next;
 		}
+		top = G.Vertices[top].in;
 	}
 	return OK;
 }
@@ -125,11 +124,8 @@ int main()
 {
 	Graph G;
 	InitGraph(G);
-	cout<<"end"<<endl;
 	Topo(G);
-	cout<<"end"<<endl;
 	GetVe(G);
-	cout<<"end"<<endl;
 	GetVl(G);
 	cout<<"end"<<endl;
 	return 0;
