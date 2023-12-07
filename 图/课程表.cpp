@@ -73,6 +73,11 @@ Status Topo(Graph&G)
 		count--;
 	}
 	G.top = top;
+	int t  = top;
+	while(t!=-1){
+		cout<<t<<endl;
+		t = G.Vertices[t].in;
+	}
 	return OK;
 }
 Status GetVe(Graph&G)
