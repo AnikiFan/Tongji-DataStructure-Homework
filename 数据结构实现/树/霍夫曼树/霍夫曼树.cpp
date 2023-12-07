@@ -12,6 +12,7 @@ typedef struct{
 typedef struct{
 	root* Nodes;
 	int leafnum,nodenum;
+	string * code;
 }Tree;
 int Search(root* Nodes,int* visit,int n)
 {
@@ -54,6 +55,7 @@ Status InitTree(Tree&T)
 		T.Nodes[i].info = (*IT).first;
 		T.Nodes[i].lchild =-1;
 		T.Nodes[i].rchild =-1;
+		cout<<"["<<i<<"]:"<<T.Nodes[i].info<<endl;
 		IT++;
 	}
 	i =T.leafnum;
@@ -67,16 +69,36 @@ Status InitTree(Tree&T)
 		T.Nodes[i].weight = T.Nodes[a].weight + T.Nodes[b].weight;
 		T.Nodes[a].parent = i;
 		T.Nodes[b].parent = i;
+		cout<<"a="<<a<<" b="<<b<<" parent="<<i<<endl;
 		i++;
 	}
-	T.Nodes[T.leafnum-1].parent = -1;
+	T.Nodes[T.nodenum-1].parent = -1;
 	return OK;
+}
+void GetCode(Tree &T)
+{
+	int  now,pre;
+	T.code = new string[T.leafnum];
+	for(int i = 0;i<T.leafnum;i++){
+		now = i;
+		while(T.Nodes[now].parent!=-1){
+			pre = now;	
+			now = T.Nodes[now].parent;
+			if(T.Nodes[now].lchild==pre)
+			  T.code[i].push_back('0');
+			else
+			  T.code[i].push_back('1');
+		}
+	}
+	for(int i = 0;i<T.leafnum;i++)
+	  reverse(T.code[i].begin(),T.code[i].end());
+	return ;
 }
 void Traverse(Tree T,int now)
 {
 	if(now ==-1)
 	  return ;
-	cout<<"pos: "<<now<<" weight: "<<T.Nodes[now].weight;
+	cout<<"pos: "<<now<<" weight: "<<T.Nodes[now].weight<<" parent: "<<T.Nodes[now].parent;
 	if(T.Nodes[now].lchild ==-1&&T.Nodes[now].rchild ==-1)
 	  cout<<" info:"<<T.Nodes[now].info<<endl;
 	else
@@ -85,6 +107,17 @@ void Traverse(Tree T,int now)
 	Traverse(T,T.Nodes[now].lchild);
 	return;
 }
+void ShowCode(Tree T)
+{
+	for(int i = 0;i<T.leafnum;i++)
+		cout<<"info:"<< T.Nodes[i].info<<" Code:"<<T.code[i]<<endl;
+	int sum = 0;
+	for(int i = 0;i<T.leafnum;i++)
+	  sum+=T.code[i].length();
+	cout<<"ratio:"<<(double)sum/(T.leafnum*8)<<endl;
+
+	return ;
+}
 int main()
 {
 	cout<<"=======TEST BEGIN======="<<endl;
@@ -92,6 +125,8 @@ int main()
 	InitTree(T);
 	cout<<"Traverse"<<endl;
 	Traverse(T,T.nodenum-1);
+	GetCode(T);
+	ShowCode(T);
 	cout<<"=======TEST E N D======="<<endl;
 	return 0;
 }
