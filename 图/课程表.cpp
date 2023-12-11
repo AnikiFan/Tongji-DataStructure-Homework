@@ -1,122 +1,123 @@
 #include<iostream>
-#include<stack>
+#define ERROR 0
 #define OK 1
 using namespace std;
 typedef int Status;
-typedef struct Arc{
-	int e;
-	int l;
-	int pos;
-	Arc*next;
+typedef struct Arc {
+	Arc* next;
+	int Adjvex;
 }Arc;
-typedef struct{
-	Arc*firstArc;
+typedef struct {
+	Arc* firstArc;
+	int AdjVex;
+	int w;
+	int indegree;
 	int e;
 	int l;
-	int w;
-	int in;
-}Vec;
-typedef struct{
-	Vec*Vertices;
-	int VecNum;
-	int ArcNum;
-	int top;
+} Vex;
+typedef struct {
+	Vex* Vertices;
+	int vexnum;
+	int arcnum;
+	int* topo;
 }Graph;
-Status InitGraph(Graph&G)
+Status InitGraph(Graph& G)
 {
-	cin >> G.VecNum;
-	G.ArcNum = 0;
-	G.Vertices = new Vec[G.VecNum+1];
-	if(!G.Vertices){
-		cout<<"OVERFLOW"<<endl;
+	cin >> G.vexnum;
+	G.Vertices = new Vex[G.vexnum];
+	if (!G.Vertices) {
+		cout << "OVERFLOW" << endl;
 		getchar();
 		return -2;
 	}
-	for(int i = 0;i<G.VecNum+1;i++)
-	  G.Vertices[i].in = 0;
-	int n;
-	Arc*p;
-	for(int i = 1;i<G.VecNum+1;i++){
-		cin>> G.Vertices[i].w;
+	for (int i = 0; i < G.vexnum; i++)
 		G.Vertices[i].firstArc = NULL;
-		cin>>G.Vertices[i].in;
-		int from;
-		for(int j = 0;j<G.Vertices[i].in;j++){
+	int from;
+	Arc* p = NULL;
+	for (int i = 0; i < G.vexnum; i++) {
+		cin >> G.Vertices[i].w;
+		cin >> G.Vertices[i].indegree;
+		for (int j = 0; j < G.Vertices[i].indegree; j++) {
+			cin >> from;
+			from--;
 			p = new Arc;
-			p->pos = i;
-			cin>>from;
+			if (!p) {
+				cout << "OVERFLOW" << endl;
+				getchar();
+				return -2;
+			}
+			p->Adjvex = i;
 			p->next = G.Vertices[from].firstArc;
 			G.Vertices[from].firstArc = p;
 		}
 	}
-	G.top= -1;
+	G.topo = new int[G.vexnum];
+	if (!G.topo) {
+		cout << "OVERFLOW" << endl;
+		getchar();
+		return -2;
+	}
 	return OK;
 }
-Status Topo(Graph&G)
+Status TopoOrder(Graph& G)
 {
-	int count = G.VecNum;
-	int top =-1;
-	int* temp= new int[G.VecNum+1]{0};
-	Arc* p;
-	while(count){
-		for(int i =1;i<G.VecNum+1;i++)
-			if(!G.Vertices[i].in&&!temp[i]){
-			  G.Vertices[i].in = top;
-			  temp[i]=1;
-			  top = i;
-			  p = G.Vertices[i].firstArc;
-			  while(p){
-				  G.Vertices[p->pos].in--;
-				  p = p->next;
-			  }
-			  break;
-			}
-		count--;
-	}
-	G.top = top;
-	return OK;
-}
-Status GetVe(Graph&G)
-{
-	int top = G.top;
-	int now;
-	Arc*p;
-	stack<int> S;
-	while(top!=-1){
-		S.push(top);
-		top = G.Vertices[top].in;
-	}
-	for(int i = 1;i<=G.VecNum;i++)
-	  G.Vertices[i].e = G.Vertices[S.top()].w;
-	while(!S.empty()){
-		now = S.top();
-		S.pop();
-		p = G.Vertices[now].firstArc;
-		while(p){
-			if(G.Vertices[p->pos].e<G.Vertices[now].w+G.Vertices[now].e)
-			  G.Vertices[p->pos].e=G.Vertices[now].w+G.Vertices[now].e;
-			p = p->next;
+	int top = -1;
+	for (int i = 0; i < G.vexnum; i++)
+		if (!G.Vertices[i].indegree) {
+			G.Vertices[i].indegree = top;
+			top = i;
 		}
-	}
-	for(int i = 1;i<=G.VecNum;i++)
-	  cout<<G.Vertices[i].e<<endl;
-	cout<<"**"<<endl;
-	return OK;
-}
-Status GetVl(Graph&G)
-{
-	int top =G.top;
-	Arc*p ;
-	for(int i = 1;i<=G.VecNum;i++)
-	  G.Vertices[i].l=G.Vertices[top].e;
-	while(top!=-1){
+	int count = 0;
+	Arc* p = NULL;
+	while (top + 1) {
+		G.topo[count++] = top;
 		p = G.Vertices[top].firstArc;
-		while(p){
-			if(G.Vertices[p->pos].l-G.Vertices[top].w<G.Vertices[top].l)
-			  G.Vertices[top].l=G.Vertices[p->pos].l-G.Vertices[top].w;
+		top = G.Vertices[top].indegree;
+		while (p) {
+			G.Vertices[p->Adjvex].indegree--;
+			if (!G.Vertices[p->Adjvex].indegree) {
+				G.Vertices[p->Adjvex].indegree = top;
+				top = p->Adjvex;
+			}
 			p = p->next;
 		}
-		top = G.Vertices[top].in;
+	}
+	if (count != G.vexnum) {
+		cout << "count:" << count << endl;
+		cout << "ERROR" << endl;
+		getchar();
+		return ERROR;
+	}
+
+	return OK;
+}
+Status GetVe(Graph& G)
+{
+	for (int i = 0; i < G.vexnum; i++)
+		G.Vertices[i].e = 0;
+	Arc* p;
+	for (int i = 0; i < G.vexnum; i++) {
+		p = G.Vertices[G.topo[i]].firstArc;
+		while (p) {
+			if (G.Vertices[p->Adjvex].e < G.Vertices[G.topo[i]].e + G.Vertices[G.topo[i]].w)
+				G.Vertices[p->Adjvex].e = G.Vertices[G.topo[i]].e + G.Vertices[G.topo[i]].w;
+			p = p->next;
+		}
+	}
+	return OK;
+}
+Status GetVl(Graph& G)
+{
+	for (int i = 0; i < G.vexnum; i++)
+		G.Vertices[i].l = G.Vertices[G.topo[G.vexnum - 1]].e;
+	Arc* p = NULL;
+	for (int i = G.vexnum - 2; i >= 0; i--) {
+		p = G.Vertices[G.topo[i]].firstArc;
+		while (p) {
+			if (G.Vertices[G.topo[i]].l > G.Vertices[p->Adjvex].l - G.Vertices[G.topo[i]].w)
+				G.Vertices[G.topo[i]].l = G.Vertices[p->Adjvex].l - G.Vertices[G.topo[i]].w;
+			p = p->next;
+		}
 	}
 	return OK;
 }
@@ -124,9 +125,10 @@ int main()
 {
 	Graph G;
 	InitGraph(G);
-	Topo(G);
+	TopoOrder(G);
 	GetVe(G);
 	GetVl(G);
-	cout<<"end"<<endl;
+	for (int i = 0; i < G.vexnum; i++)
+		cout << G.Vertices[i].e + G.Vertices[i].w << " " << (G.Vertices[i].e == G.Vertices[i].l ? 1 : 0) << endl;
 	return 0;
 }
